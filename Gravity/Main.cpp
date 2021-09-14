@@ -15,6 +15,8 @@ bool isDragging = false;
 int offsetX = 0;
 int offsetY = 0;
 
+float zoom = 1;
+
 int mPosXOne = SCREEN_WIDTH / 2;
 int mPosYOne = SCREEN_HEIGHT / 2;
 
@@ -64,6 +66,12 @@ int main() {
 					keep_window_open = false;
 					break;
 
+				case SDL_MOUSEWHEEL:
+
+					zoom += e.wheel.y > 0 ? 0.1 : -0.1;
+
+					break;
+
 				case SDL_KEYDOWN:
 	
 					//Select surfaces based on key press
@@ -74,7 +82,9 @@ int main() {
 
 							free(world);
 
-							world = new World(Generator::CLUSTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
+							int generator = rand() % 4;
+							world = new World(generator, SCREEN_WIDTH, SCREEN_HEIGHT);
+							
 							gk = GravityKernel(world);
 
 							gk.cudaPrep();
@@ -100,8 +110,8 @@ int main() {
 					}
 
 					if (isDragging) {
-						offsetX += mPosXTwo - mPosXOne;
-						offsetY += mPosYTwo - mPosYOne;
+						offsetX += (mPosXTwo - mPosXOne);
+						offsetY += (mPosYTwo - mPosYOne);
 					}
 
 					break;
@@ -115,7 +125,7 @@ int main() {
 		}
 
 		gk.runKernel();
-		world->render(window_renderer, offsetX, offsetY);
+		world->render(window_renderer, offsetX, offsetY, zoom);
 	}
 
 	gk.cudaClear();

@@ -2,7 +2,7 @@
 #include<iostream>
 #include<time.h>
 
-#define MAX_VEL_MAG 7500
+#define MAX_VEL_MAG 250
 #define MAX_CLUSTERS 10
 
 World::World() {
@@ -91,6 +91,10 @@ World::World(int generator, int screenWidth, int screenHeight) {
 			
 			int rad = rand() % Generator::SPAWN_RANGE / 8 + 1;
 
+			float velMag = rand() % 20;
+			float linearX = (rand() % 10) - 5;
+			float linearY = (rand() % 10) - 5;
+
 			for (int j = 0; j < upperLimit; j++) {
 
 				float spawn[2] = { 0, 0 };
@@ -102,9 +106,19 @@ World::World(int generator, int screenWidth, int screenHeight) {
 				spawn[1] = randRad * sin(deg) + clusterY;
 
 				float vel[2] = { 0,0 };
-				float velMag = rand() % 30;
+				
 				vel[0] = -velMag * sin(deg);
 				vel[1] = velMag * cos(deg);
+
+				if ((rand() % 10) > 5) {
+					vel[0] = -vel[0];
+					vel[1] = -vel[1];
+				}
+
+				vel[0] += linearX;
+				vel[1] += linearY;
+
+
 
 				if (used < Constant::NUM_PARTICLES) {
 					particles[used++] = Particle(spawn, vel);
@@ -121,20 +135,19 @@ World::World(int generator, int screenWidth, int screenHeight) {
 }
 
 World::~World() {
-	delete this;
+	free(this);
 }
 
 
-void World::render(SDL_Renderer* window_renderer, int offsetX, int offsetY) {
+void World::render(SDL_Renderer* window_renderer, int offsetX, int offsetY, float zoom) {
 	SDL_RenderClear(window_renderer);
 
 	for (int i = 0; i < Constant::NUM_PARTICLES; i++) {
 		SDL_Rect rect;
 		rect.w = this->particles[i].mass / 4 + 1;
 		rect.h = this->particles[i].mass / 4 + 1;
-		rect.x = this->particles[i].position[0] + offsetX - rect.w/2;
-		rect.y = this->particles[i].position[1] + offsetY - rect.h/2;
-		
+		rect.x = zoom * (this->particles[i].position[0]) + offsetX - rect.w/2;
+		rect.y = zoom * (this->particles[i].position[1]) + offsetY - rect.h/2;
 
 
 		float velMag = this->particles[i].velocity[0] * this->particles[i].velocity[0] + this->particles[i].velocity[1] * this->particles[i].velocity[1];
@@ -150,7 +163,8 @@ void World::render(SDL_Renderer* window_renderer, int offsetX, int offsetY) {
 		//rect.w = 10;
 		//rect.h = 10;
 
-		SDL_SetRenderDrawColor(window_renderer, velMag * 200 + 55, velMag*225 + 30, velMag * velMag * 200, 255);
+		SDL_SetRenderDrawColor(window_renderer, velMag * 225 + rand() % 30, velMag * 255,  velMag * 150 + 20, 255);
+		//SDL_SetRenderDrawColor(window_renderer, velMag * 225 + rand() % 30, velMag * velMag * 150 + rand() % 50, rand() % 20, 255);
 		SDL_RenderFillRect(window_renderer, &rect);
 
 	}

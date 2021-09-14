@@ -15,7 +15,7 @@ class World {
 
 		~World();
 		
-		void render(SDL_Renderer* window_renderer, int offsetX, int offsetY);
+		void render(SDL_Renderer* window_renderer, int offsetX, int offsetY, float zoom);
 
 		Particle particles[Constant::NUM_PARTICLES];
 

@@ -14,7 +14,7 @@ __global__ void acceleration_kernel(Particle* particle, float* acc_sum, Particle
 
 	int positionID = blockDim.x * blockIdx.x + threadIdx.x;
 	
-	float gConstant = 5;
+	float gConstant = 10;
 
 	if (positionID < count) {
 		Particle ref = particles[positionID];
@@ -31,8 +31,8 @@ __global__ void acceleration_kernel(Particle* particle, float* acc_sum, Particle
 
 			float rad = atan2(distY, distX);
 		
-			acc_sum[positionID] = force * cos(rad);
-			acc_sum[positionID + Constant::NUM_PARTICLES] = force * sin(rad);
+			acc_sum[positionID] = force * cos(rad)/particle->mass;
+			acc_sum[positionID + Constant::NUM_PARTICLES] = force * sin(rad)/particle->mass;
 		}
 		else {
 			acc_sum[positionID] = 0;
@@ -70,8 +70,9 @@ __global__ void sum_kernel(float* acc_sum) {
 
 __global__ void gravity_kernel(Particle* particles, float* acc_sum, int count) {
 
-	float dt = .05;
-	float drag = 0.01;
+	float dt = .10
+		;
+	float drag = 0;
 
 	int id = blockDim.x * blockIdx.x + threadIdx.x;
 
